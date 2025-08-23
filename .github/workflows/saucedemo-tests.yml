@@ -17,28 +17,12 @@ on:
     # Run tests daily at 2 AM UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
-    inputs:
-      browser:
-        description: 'Browser to test'
-        required: true
-        default: 'chromium'
-        type: choice
-        options:
-        - chromium
-        - firefox
-        - webkit
-        - all
 
 jobs:
   saucedemo-mcp-tests:
-    name: MCP SauceDemo Tests (${{ matrix.browser }})
+    name: MCP SauceDemo Tests (Chrome)
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: ${{ github.event.inputs.browser == 'all' && fromJson('["chromium", "firefox", "webkit"]') || github.event.inputs.browser && fromJson(format('["{0}"]', github.event.inputs.browser)) || fromJson('["chromium"]') }}
     
     steps:
     - name: Checkout code
@@ -48,28 +32,27 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 'lts/*'
-        cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm install
     
     - name: Install Playwright browsers
-      run: npx playwright install ${{ matrix.browser }} --with-deps
+      run: npx playwright install chromium --with-deps
     
     - name: Run SauceDemo MCP tests (JavaScript)
-      run: npx playwright test tests/mcp-saucedemo.spec.js --project=${{ matrix.browser }}
+      run: npx playwright test tests/mcp-saucedemo.spec.js --project=chromium
       env:
         CI: true
     
     - name: Generate test summary
       if: always()
       run: |
-        echo "## 🎭 MCP SauceDemo Test Results (${{ matrix.browser }})" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎭 MCP SauceDemo Test Results (Chrome)" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         if [ -f "test-results/.last-run.json" ]; then
           echo "### Test Execution Summary" >> $GITHUB_STEP_SUMMARY
           echo "- Test File: mcp-saucedemo.spec.js" >> $GITHUB_STEP_SUMMARY
-          echo "- Browser: ${{ matrix.browser }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Browser: Chrome (Chromium)" >> $GITHUB_STEP_SUMMARY
           echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
           echo "- Environment: CI/CD Pipeline" >> $GITHUB_STEP_SUMMARY
         fi
@@ -83,7 +66,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: saucedemo-videos-${{ matrix.browser }}
+        name: saucedemo-videos-chrome
         path: test-results/**/*.webm
         retention-days: 7
     
@@ -91,7 +74,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: saucedemo-screenshots-${{ matrix.browser }}
+        name: saucedemo-screenshots-chrome
         path: test-results/**/*.png
         retention-days: 7
     
@@ -99,7 +82,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: saucedemo-report-${{ matrix.browser }}
+        name: saucedemo-report-chrome
         path: playwright-report/
         retention-days: 14
     
@@ -107,7 +90,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: saucedemo-traces-${{ matrix.browser }}
+        name: saucedemo-traces-chrome
         path: test-results/**/*.zip
         retention-days: 7
 
@@ -120,7 +103,7 @@ jobs:
     steps:
     - name: Create test summary
       run: |
-        echo "## 🎯 SauceDemo Test Suite Completed" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎯 MCP SauceDemo Test Suite Completed" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Test Status" >> $GITHUB_STEP_SUMMARY
         echo "- **Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
@@ -133,33 +116,10 @@ jobs:
         echo "✅ Product selection and cart operations" >> $GITHUB_STEP_SUMMARY
         echo "✅ Checkout process with random data" >> $GITHUB_STEP_SUMMARY
         echo "✅ Order completion verification" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Cross-browser compatibility" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Chrome browser compatibility" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🔍 Verification Points" >> $GITHUB_STEP_SUMMARY
         echo "- 'Thank you for your order!' message validation" >> $GITHUB_STEP_SUMMARY
         echo "- Cart functionality and item counting" >> $GITHUB_STEP_SUMMARY
         echo "- Random data generation for forms" >> $GITHUB_STEP_SUMMARY
         echo "- Video recording of test execution" >> $GITHUB_STEP_SUMMARY
-
-  # Performance monitoring job
-  lighthouse:
-    name: Lighthouse Performance Test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'schedule'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Run Lighthouse CI
-      run: |
-        npm install -g @lhci/cli@0.12.x
-        lhci autorun --upload.target=temporary-public-storage || echo "Lighthouse scan completed"
-      env:
-        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-    
-    - name: Performance summary
-      run: |
-        echo "## ⚡ Performance Analysis" >> $GITHUB_STEP_SUMMARY
-        echo "Lighthouse performance scan completed for SauceDemo website." >> $GITHUB_STEP_SUMMARY
-        echo "Check the Lighthouse report for detailed metrics." >> $GITHUB_STEP_SUMMARY

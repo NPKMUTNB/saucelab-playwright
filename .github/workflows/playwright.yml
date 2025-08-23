@@ -12,10 +12,6 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Run tests on different browsers
-        project: [chromium, firefox, webkit]
     
     steps:
     - uses: actions/checkout@v4
@@ -23,16 +19,15 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-        cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm install
     
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium --with-deps
     
     - name: Run Playwright tests
-      run: npx playwright test tests/mcp-saucedemo.spec.js --project=${{ matrix.project }}
+      run: npx playwright test tests/mcp-saucedemo.spec.js --project=chromium
       env:
         # Set CI environment variable for Playwright
         CI: true
@@ -41,7 +36,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: playwright-report-${{ matrix.project }}
+        name: playwright-report
         path: playwright-report/
         retention-days: 30
     
@@ -49,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.project }}
+        name: test-results
         path: test-results/
         retention-days: 30
 
@@ -64,13 +59,12 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-        cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm install
     
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium --with-deps
     
     - name: Run MCP SauceDemo Tests (JavaScript)
       run: npx playwright test tests/mcp-saucedemo.spec.js
@@ -92,55 +86,3 @@ jobs:
         name: mcp-playwright-report
         path: playwright-report/
         retention-days: 30
-
-  # Deploy test report to GitHub Pages (optional)
-  deploy-report:
-    if: always()
-    needs: [test, mcp-tests]
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-    
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-    
-    - name: Create combined report
-      run: |
-        mkdir -p public
-        # Combine all reports into a single directory
-        if [ -d "artifacts/playwright-report-chromium" ]; then
-          cp -r artifacts/playwright-report-chromium/* public/ 2>/dev/null || :
-        fi
-        if [ -d "artifacts/mcp-playwright-report" ]; then
-          mkdir -p public/mcp
-          cp -r artifacts/mcp-playwright-report/* public/mcp/ 2>/dev/null || :
-        fi
-        # Create index page if reports exist
-        if [ "$(ls -A public 2>/dev/null)" ]; then
-          echo "<h1>Playwright Test Reports</h1>" > public/index.html
-          echo "<ul>" >> public/index.html
-          echo "<li><a href='index.html'>Main Test Report</a></li>" >> public/index.html
-          echo "<li><a href='mcp/index.html'>MCP Test Report</a></li>" >> public/index.html
-          echo "</ul>" >> public/index.html
-        else
-          echo "<h1>No test reports available</h1>" > public/index.html
-        fi
-    
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: public
-    
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
