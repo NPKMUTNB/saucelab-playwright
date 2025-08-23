@@ -1,0 +1,151 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Run tests on different browsers
+        project: [chromium, firefox, webkit]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run Playwright tests
+      run: npx playwright test --project=${{ matrix.project }}
+      env:
+        # Set CI environment variable for Playwright
+        CI: true
+    
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.project }}
+        path: playwright-report/
+        retention-days: 30
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.project }}
+        path: test-results/
+        retention-days: 30
+
+  # Run MCP specific tests
+  mcp-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run MCP TypeScript Tests
+      run: npm run test:mcp
+      env:
+        CI: true
+    
+    - name: Run MCP JavaScript Tests
+      run: npm run test:mcp:js
+      env:
+        CI: true
+    
+    - name: Upload MCP Test Videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mcp-test-videos
+        path: test-results/**/*.webm
+        retention-days: 30
+    
+    - name: Upload MCP Test Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mcp-playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  # Deploy test report to GitHub Pages (optional)
+  deploy-report:
+    if: always()
+    needs: [test, mcp-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Create combined report
+      run: |
+        mkdir -p public
+        # Combine all reports into a single directory
+        if [ -d "artifacts/playwright-report-chromium" ]; then
+          cp -r artifacts/playwright-report-chromium/* public/ 2>/dev/null || :
+        fi
+        if [ -d "artifacts/mcp-playwright-report" ]; then
+          mkdir -p public/mcp
+          cp -r artifacts/mcp-playwright-report/* public/mcp/ 2>/dev/null || :
+        fi
+        # Create index page if reports exist
+        if [ "$(ls -A public 2>/dev/null)" ]; then
+          echo "<h1>Playwright Test Reports</h1>" > public/index.html
+          echo "<ul>" >> public/index.html
+          echo "<li><a href='index.html'>Main Test Report</a></li>" >> public/index.html
+          echo "<li><a href='mcp/index.html'>MCP Test Report</a></li>" >> public/index.html
+          echo "</ul>" >> public/index.html
+        else
+          echo "<h1>No test reports available</h1>" > public/index.html
+        fi
+    
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: public
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

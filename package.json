@@ -1,0 +1,26 @@
+{
+  "name": "saucelab-playwright-mcp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "test:mcp": "npx playwright test tests/mcp-saucedemo.spec.ts",
+    "test:mcp:headed": "npx playwright test tests/mcp-saucedemo.spec.ts --headed",
+    "test:mcp:js": "npx playwright test tests/mcp-saucedemo.spec.js",
+    "test:mcp:js:headed": "npx playwright test tests/mcp-saucedemo.spec.js --headed",
+    "report": "npx playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}
