@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เอกสารการกำหนดค่า Dependabot - SauceDemo Playwright</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #2ea043 0%, #1a7f37 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .nav {
+            background-color: #f6f8fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #d0d7de;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        .nav a {
+            color: #0969da;
+            text-decoration: none;
+            padding: 5px 0;
+            display: block;
+            transition: color 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: #0550ae;
+        }
+
+        .nav a.active {
+            font-weight: bold;
+            color: #2ea043;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d0d7de;
+        }
+
+        h1, h2, h3 {
+            color: #24292f;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 2px solid #2ea043;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: #0969da;
+        }
+
+        .code-block {
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .inline-code {
+            background-color: rgba(175, 184, 193, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        .info-box {
+            background-color: #ddf4ff;
+            border-left: 4px solid #0969da;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .success-box {
+            background-color: #dafbe1;
+            border-left: 4px solid #2ea043;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .warning-box {
+            background-color: #fff8c5;
+            border-left: 4px solid #fb8500;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        .ecosystem-card {
+            background: linear-gradient(135deg, #2ea043 0%, #1a7f37 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .ecosystem-card h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .schedule-info {
+            background: linear-gradient(135deg, #0969da 0%, #0550ae 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .schedule-time {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .benefits-list li:before {
+            content: "✅";
+            margin-right: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background-color: #f6f8fa;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .nav ul {
+                columns: 1;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 เอกสารการกำหนดค่า Dependabot</h1>
+            <p>การจัดการ Dependencies อัตโนมัติสำหรับโปรเจ็กต์ SauceDemo Playwright</p>
+        </div>
+
+        <div class="nav">
+            <h3>📋 สารบัญ</h3>
+            <ul>
+                <li><a href="#overview">ภาพรวม</a></li>
+                <li><a href="#what-is">Dependabot คืออะไร?</a></li>
+                <li><a href="#npm-config">การกำหนดค่า NPM</a></li>
+                <li><a href="#actions-config">การกำหนดค่า GitHub Actions</a></li>
+                <li><a href="#scheduling">กำหนดการและเวลา</a></li>
+                <li><a href="#security">การจัดการความปลอดภัย</a></li>
+                <li><a href="#benefits">ประโยชน์</a></li>
+                <li><a href="#troubleshooting">การแก้ไขปัญหา</a></li>
+            </ul>
+        </div>
+
+        <section id="overview" class="section">
+            <h1>🎯 ภาพรวม</h1>
+            <p>Dependabot เป็นเครื่องมือจัดการ dependencies อัตโนมัติของ GitHub ที่ช่วยให้ dependencies ของโปรเจ็กต์อัปเดตอยู่เสมอ โดยการสร้าง pull requests อัตโนมัติเมื่อมีเวอร์ชันใหม่</p>
+            
+            <div class="success-box">
+                <h4>🎉 ประโยชน์หลัก</h4>
+                <ul class="benefits-list">
+                    <li>การอัปเดตความปลอดภัยอัตโนมัติ</li>
+                    <li>ลดหนี้ทางเทคนิค</li>
+                    <li>กำหนดการอัปเดตที่คาดเดาได้</li>
+                    <li>ข้อมูล PR ที่ครบถ้วน</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="what-is" class="section">
+            <h1>🤖 Dependabot คืออะไร?</h1>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3><span class="emoji">🔍</span>ตรวจสอบ Dependencies</h3>
+                    <p>สแกนโปรเจ็กต์เพื่อหา dependencies ที่ล้าสมัยและช่องโหว่ความปลอดภัยอัตโนมัติ</p>
+                </div>
+                
+                <div class="card">
+                    <h3><span class="emoji">📝</span>สร้าง Pull Requests</h3>
+                    <p>สร้าง PRs พร้อมการอัปเดต dependencies เมื่อมีเวอร์ชันใหม่</p>
+                </div>
+                
+                <div class="card">
+                    <h3><span class="emoji">🛡️</span>อัปเดตความปลอดภัย</h3>
+                    <p>ให้ความสำคัญกับการแก้ไขช่องโหว่ความปลอดภัยพร้อมการแจ้งเตือนทันที</p>
+                </div>
+                
+                <div class="card">
+                    <h3><span class="emoji">⏰</span>กำหนดการที่ปรับแต่งได้</h3>
+                    <p>ให้คุณควบคุมว่าเมื่อไหร่และอย่างไรที่จะเสนอการอัปเดต</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="npm-config" class="section">
+            <h1>📦 การกำหนดค่า NPM Ecosystem</h1>
+            
+            <div class="ecosystem-card">
+                <h3>การจัดการแพ็คเกจ NPM</h3>
+                <p>จัดการ JavaScript และ Node.js dependencies รวมถึง Playwright และ testing frameworks</p>
+            </div>
+
+            <div class="code-block">- package-ecosystem: "npm"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+    day: "monday"
+    time: "09:00"
+  open-pull-requests-limit: 10
+  reviewers:
+    - "dependabot[bot]"
+  assignees:
+    - "dependabot[bot]"
+  commit-message:
+    prefix: "⬆️"
+    include: "scope"</div>
+
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">📍</span>ไดเรกทอรีเป้าหมาย</h4>
+                    <p><strong>Root (/):</strong> ตรวจสอบ <span class="inline-code">package.json</span> และ <span class="inline-code">package-lock.json</span></p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🔢</span>ขีดจำกัด PR</h4>
+                    <p><strong>10 PRs:</strong> จำกัด pull requests พร้อมกันสูงสุดสำหรับ npm updates</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">⬆️</span>Prefix ของ Commit</h4>
+                    <p><strong>Emoji ลูกศร:</strong> ระบุการอัปเดต dependency ได้ง่าย</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">👥</span>การมอบหมาย</h4>
+                    <p><strong>มอบหมายอัตโนมัติ:</strong> Dependabot bot เป็น reviewer อัตโนมัติ</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="actions-config" class="section">
+            <h1>🔧 การกำหนดค่า GitHub Actions</h1>
+            
+            <div class="ecosystem-card">
+                <h3>การจัดการ GitHub Actions Workflow</h3>
+                <p>รักษา CI/CD workflows ให้อัปเดตด้วยเวอร์ชัน GitHub Actions ล่าสุดและการแก้ไขความปลอดภัย</p>
+            </div>
+
+            <div class="code-block">- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+    day: "monday"
+    time: "09:00"
+  open-pull-requests-limit: 5
+  commit-message:
+    prefix: "🔧"
+    include: "scope"</div>
+
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">📂</span>ไดเรกทอรี Workflow</h4>
+                    <p><strong>.github/workflows/:</strong> ตรวจสอบไฟล์ workflow YAML ทั้งหมด</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🔢</span>ขีดจำกัด PR</h4>
+                    <p><strong>5 PRs:</strong> ขีดจำกัดต่ำกว่าเนื่องจาก Actions updates น้อยกว่า</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🔧</span>Prefix ของ Commit</h4>
+                    <p><strong>Emoji ประแจ:</strong> ระบุการอัปเดต GitHub Actions</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">⚡</span>Actions ที่อัปเดต</h4>
+                    <p><strong>Workflow Actions:</strong> checkout, setup-node, upload-artifact</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="scheduling" class="section">
+            <h1>⏰ กำหนดการและเวลา</h1>
+            
+            <div class="schedule-info">
+                <div class="schedule-time">วันจันทร์ 9:00 น. UTC</div>
+                <div>การอัปเดต Dependencies รายสัปดาห์</div>
+            </div>
+
+            <div class="info-box">
+                <h3>ประโยชน์ของกำหนดการวันจันทร์รายสัปดาห์</h3>
+                <ul>
+                    <li><strong>การอัปเดตที่คาดเดาได้:</strong> ทีมรู้ว่าเมื่อไหร่จะมี dependency PRs</li>
+                    <li><strong>ปริมาณที่จัดการได้:</strong> ช่วงเวลารายสัปดาห์ป้องกันไม่ให้ทีมครอบงำ</li>
+                    <li><strong>เวลาวันจันทร์:</strong> จัดการการอัปเดตที่จุดเริ่มต้นของสัปดาห์การทำงาน</li>
+                    <li><strong>UTC 9:00 น.:</strong> ตรงกับเวลาทำการทั่วโลก</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="security" class="section">
+            <h1>🛡️ การจัดการความปลอดภัยและช่องโหว่</h1>
+
+            <div class="warning-box">
+                <h3>🚨 การอัปเดตความปลอดภัยอัตโนมัติ</h3>
+                <p>Dependabot ให้ความสำคัญกับการอัปเดตความปลอดภัยโดยสร้าง PRs ทันทีสำหรับช่องโหว่ความปลอดภัย</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">⚡</span>การแจ้งเตือนทันที</h4>
+                    <p>ช่องโหว่ความปลอดภัยข้ามกำหนดการปกติเพื่อการดูแลทันที</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🏷️</span>การติดป้ายที่ชัดเจน</h4>
+                    <p>PRs ความปลอดภัยถูกทำเครื่องหมายและจัดทำเอกสารอย่างชัดเจน</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">📊</span>ข้อมูล CVE</h4>
+                    <p>รวมถึงรายละเอียด Common Vulnerabilities and Exposures</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🔧</span>การแก้ไข</h4>
+                    <p>คำอธิบายว่าการอัปเดตแก้ไขช่องโหว่อย่างไร</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="section">
+            <h1>🎉 ประโยชน์สำหรับโปรเจ็กต์นี้</h1>
+
+            <div class="grid">
+                <div class="ecosystem-card">
+                    <h3>สำหรับการทดสอบ Playwright</h3>
+                    <ul class="benefits-list">
+                        <li>Browser drivers ที่อัปเดตสำหรับความเข้ากันได้ล่าสุด</li>
+                        <li>การแก้ไขความปลอดภัยสำหรับ testing dependencies</li>
+                        <li>การปรับปรุงประสิทธิภาพใน testing frameworks</li>
+                        <li>การแก้ไขบัคใน Playwright และเครื่องมือที่เกี่ยวข้อง</li>
+                    </ul>
+                </div>
+                
+                <div class="ecosystem-card">
+                    <h3>สำหรับ GitHub Actions</h3>
+                    <ul class="benefits-list">
+                        <li>คุณลักษณะ GitHub Actions ล่าสุด</li>
+                        <li>การอัปเดตความปลอดภัยสำหรับ CI/CD pipeline</li>
+                        <li>เวลาการดำเนินการ workflow ที่ปรับปรุง</li>
+                        <li>การรักษาความเข้ากันได้กับแพลตฟอร์ม</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="section">
+            <h1>🔧 การแก้ไขปัญหา</h1>
+
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔄</span>PRs มากเกินไป</h4>
+                    <p><strong>ปัญหา:</strong> ครอบงำด้วยการอัปเดต dependency</p>
+                    <p><strong>แก้ไข:</strong> ลด <span class="inline-code">open-pull-requests-limit</span> หรือเปลี่ยนเป็นกำหนดการรายเดือน</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">❌</span>การอัปเดตล้มเหลว</h4>
+                    <p><strong>ปัญหา:</strong> Dependabot PRs ล้มเหลวในการตรวจสอบ CI/CD</p>
+                    <p><strong>แก้ไข:</strong> ตรวจสอบการเปลี่ยนแปลงใน changelog และอัปเดตโค้ด</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">🔍</span>การอัปเดตที่หายไป</h4>
+                    <p><strong>ปัญหา:</strong> การอัปเดตที่คาดหวังไม่ปรากฏ</p>
+                    <p><strong>แก้ไข:</strong> ตรวจสอบ Dependabot logs ใน repository insights</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="emoji">⚙️</span>การตรวจสอบการกำหนดค่า</h4>
+                    <p>ตรวจสอบไวยากรณ์ YAML, ตำแหน่งไฟล์ที่ <span class="inline-code">.github/dependabot.yml</span> และสิทธิ์ของ Dependabot</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer">
+            <h3>📝 สรุป</h3>
+            <p>การกำหนดค่า Dependabot ของเราให้การจัดการ dependency อัตโนมัติและตามกำหนดการที่เพิ่มความปลอดภัย ลดหนี้ทางเทคนิค ประหยัดเวลา และปรับปรุงความน่าเชื่อถือ กำหนดการวันจันทร์ 9:00 น. รายสัปดาห์พร้อมขีดจำกัด PR ที่เหมาะสมรับประกันการอัปเดต dependency ที่จัดการได้และผสานรวมกับ development workflow ของเราอย่างราบรื่น</p>
+            
+            <p><strong>ไฟล์การกำหนดค่า:</strong> <span class="inline-code">.github/dependabot.yml</span></p>
+            <p><strong>อัปเดตล่าสุด:</strong> สิงหาคม 2025 | <strong>เวอร์ชัน:</strong> 2</p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight current section in navigation
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const sections = document.querySelectorAll('section[id]');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.offsetHeight;
+                
+                if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            if (current) {
+                const activeLink = document.querySelector(`.nav a[href="#${current}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        });
+
+        // Add hover effects to cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
