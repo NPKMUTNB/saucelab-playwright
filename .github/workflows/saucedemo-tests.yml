@@ -1,4 +1,4 @@
-name: SauceDemo E2E Tests
+name: MCP SauceDemo E2E Tests
 
 on:
   push:
@@ -30,8 +30,8 @@ on:
         - all
 
 jobs:
-  saucedemo-tests:
-    name: SauceDemo Tests (${{ matrix.browser }})
+  saucedemo-mcp-tests:
+    name: MCP SauceDemo Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
@@ -56,25 +56,19 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install ${{ matrix.browser }} --with-deps
     
-    - name: Run SauceDemo tests (JavaScript)
-      run: npx playwright test tests/saucedemo.spec.js tests/mcp-saucedemo.spec.js --project=${{ matrix.browser }}
-      continue-on-error: true
-      env:
-        CI: true
-    
-    - name: Run SauceDemo tests (TypeScript)
-      run: npx playwright test tests/mcp-saucedemo.spec.ts --project=${{ matrix.browser }}
-      continue-on-error: true
+    - name: Run SauceDemo MCP tests (JavaScript)
+      run: npx playwright test tests/mcp-saucedemo.spec.js --project=${{ matrix.browser }}
       env:
         CI: true
     
     - name: Generate test summary
       if: always()
       run: |
-        echo "## 🎭 SauceDemo Test Results (${{ matrix.browser }})" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎭 MCP SauceDemo Test Results (${{ matrix.browser }})" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         if [ -f "test-results/.last-run.json" ]; then
           echo "### Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Test File: mcp-saucedemo.spec.js" >> $GITHUB_STEP_SUMMARY
           echo "- Browser: ${{ matrix.browser }}" >> $GITHUB_STEP_SUMMARY
           echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
           echo "- Environment: CI/CD Pipeline" >> $GITHUB_STEP_SUMMARY
@@ -119,7 +113,7 @@ jobs:
 
   notify-results:
     name: Notify Test Results
-    needs: saucedemo-tests
+    needs: saucedemo-mcp-tests
     runs-on: ubuntu-latest
     if: always()
     

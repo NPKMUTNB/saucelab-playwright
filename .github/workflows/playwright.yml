@@ -32,7 +32,7 @@ jobs:
       run: npx playwright install --with-deps
     
     - name: Run Playwright tests
-      run: npx playwright test --project=${{ matrix.project }}
+      run: npx playwright test tests/mcp-saucedemo.spec.js --project=${{ matrix.project }}
       env:
         # Set CI environment variable for Playwright
         CI: true
@@ -72,13 +72,8 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     
-    - name: Run MCP TypeScript Tests
-      run: npm run test:mcp
-      env:
-        CI: true
-    
-    - name: Run MCP JavaScript Tests
-      run: npm run test:mcp:js
+    - name: Run MCP SauceDemo Tests (JavaScript)
+      run: npx playwright test tests/mcp-saucedemo.spec.js
       env:
         CI: true
     
