@@ -33,7 +33,7 @@ jobs:
         CI: true
     
     - name: Upload Playwright Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: playwright-report
@@ -41,7 +41,7 @@ jobs:
         retention-days: 30
     
     - name: Upload Test Results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: test-results
@@ -72,7 +72,7 @@ jobs:
         CI: true
     
     - name: Upload MCP Test Videos
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: mcp-test-videos
@@ -80,7 +80,7 @@ jobs:
         retention-days: 30
     
     - name: Upload MCP Test Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: mcp-playwright-report

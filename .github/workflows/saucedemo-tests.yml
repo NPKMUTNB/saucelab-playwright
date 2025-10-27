@@ -63,7 +63,7 @@ jobs:
         echo "- Trace files for debugging" >> $GITHUB_STEP_SUMMARY
     
     - name: Upload test videos
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: saucedemo-videos-chrome
@@ -71,7 +71,7 @@ jobs:
         retention-days: 7
     
     - name: Upload test screenshots
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: saucedemo-screenshots-chrome
@@ -79,7 +79,7 @@ jobs:
         retention-days: 7
     
     - name: Upload HTML report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: saucedemo-report-chrome
@@ -87,7 +87,7 @@ jobs:
         retention-days: 14
     
     - name: Upload trace files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: saucedemo-traces-chrome
